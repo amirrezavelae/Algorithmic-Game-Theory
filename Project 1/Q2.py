@@ -156,83 +156,61 @@ class LPSolver(object):
 #     print(solved)
 
 
-def find_nash_equilibrium(matrix1, matrix2, num_rows, num_cols):
-    # Create the payoff matrix for the linear program
-    flag = 1
-    for i in range(num_cols):
-        A_ub = []
-        b_ub = []
-        c = [1 for i in range(num_rows)]
-        A_ub = [[1 for i in range(num_rows)]]
-        b_ub.append(1)
-        A_ub.append([-1 for i in range(num_rows)])
-        b_ub.append(-1)
-        for k in range(num_rows):
-            A_ub.append([-1 if k == j else 0 for j in range(num_rows)])
-            b_ub.append(0)
-        for j in range(num_cols):
-            if i != j:
-                A_ub.append([-matrix2[k][i] + matrix2[k][j]
-                            for k in range(num_rows)])
-                b_ub.append(0)
-
-        print(A_ub)
-        print(b_ub)
-        solver = LPSolver(A_ub, b_ub, c)
-        # print(solver.solve())
-        # print("")
-        solved = solver.solve()
-        if solved[0] != -inf:
-            flag = 0
-            for j in range(len(solved[1])):
-                print("{:.6f}".format(solved[1][j]), end=" ")
-            print("")
-        # if flag == 0:
-        #     break
-    flag = 1
+def find_correlated_nash_equilibrium(matrix1, matrix2, num_rows, num_cols):
+    c = [1 for i in range(num_rows*num_cols)]
+    A = []
+    b = []
     for i in range(num_rows):
-        A_ub = []
-        b_ub = []
-        c = [1 for i in range(num_cols)]
-        A_ub = [[1 for i in range(num_cols)]]
-        b_ub.append(1)
-        A_ub.append([-1 for i in range(num_cols)])
-        b_ub.append(-1)
-        for k in range(num_cols):
-            A_ub.append([-1 if k == j else 0 for j in range(num_cols)])
-            b_ub.append(0)
-        for j in range(num_rows):
-            if i != j:
-                A_ub.append([-matrix1[i][k] + matrix1[j][k]
-                            for k in range(num_cols)])
-                b_ub.append(0)
+        for j in range(num_cols):
+            A.append([0 for k in range(num_rows*num_cols)])
+            A[-1][i*num_cols+j] = 1
+    b.append(1)
+    for i in range(num_rows):
+        for j in range(num_cols):
+            A.append([0 for k in range(num_rows*num_cols)])
+            A[-1][i*num_cols+j] = -1
+    b.append(-1)
+    for i in range(num_rows):
+        for j in range(num_cols):
+            A.append([0 for k in range(num_rows*num_cols)])
+            A[-1][i*num_cols+j] = -1
+    b.append(0)
+    for i in range(num_rows):
+        for j in range(num_cols):
+            A.append([0 for k in range(num_rows*num_cols)])
+            A[-1][i*num_cols+j] = 1
+    b.append(0)
+    for i in range(num_rows):
+        for j in range(num_cols):
+            A.append([0 for k in range(num_rows*num_cols)])
+            A[-1][i*num_cols+j] = -matrix1[i][j]
+    b.append(0)
+    for i in range(num_rows):
+        for j in range(num_cols):
+            A.append([0 for k in range(num_rows*num_cols)])
+            A[-1][i*num_cols+j] = -matrix2[i][j]
+    b.append(0)
+    solver = LPSolver(A, b, c)
+    print(solver.solve())
 
-        print(A_ub)
-        print(b_ub)
-        solver = LPSolver(A_ub, b_ub, c)
-        solved = solver.solve()
-        if solved[0] != -inf:
-            flag = 0
-            for j in range(len(solved[1])):
-                print("{:.6f}".format(solved[1][j]), end=" ")
-        # print("")
-        # if flag == 0:
-        #     break
+
+def slice_even_odd_columns(matrix):
+    even_columns = [row[::2] for row in matrix]
+    odd_columns = [row[1::2] for row in matrix]
+    return even_columns, odd_columns
 
 
-# Read the reward matrices siza from the console
+esgh1, esgh2 = map(float, input().split())
 num_rows, num_cols = map(int, input().split())
 
-# Read payoff matrix 1 from the console
-matrix1 = []
+total_matrix = []
 for i in range(num_rows):
-    matrix1.append(list(map(int, input().split())))
+    total_matrix.append(list(map(int, input().split())))
 
-# Read payoff matrix 2 from the console
-matrix2 = []
-for i in range(num_rows):
-    matrix2.append(list(map(int, input().split())))
+matrix1, matrix2 = slice_even_odd_columns(total_matrix)
+# print("matrix1: ", matrix1)
+# print("matrix2: ", matrix2)
 
 
 # Find the Nash equilibrium
-find_nash_equilibrium(matrix1, matrix2, num_rows, num_cols)
+find_correlated_nash_equilibrium(matrix1, matrix2, num_rows, num_cols)

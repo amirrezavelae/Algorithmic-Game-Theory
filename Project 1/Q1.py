@@ -156,77 +156,115 @@ class LPSolver(object):
 #     print(solved)
 
 
-def find_nash_equilibrium(matrix1, matrix2, num_rows, num_cols):
+def find_nash_equilibrium(matrix1, matrix2, num_rows, num_cols, row_start, col_start, tuple):
     # Create the payoff matrix for the linear program
     flag = 1
-    for i in range(num_cols):
-        for m in range(num_rows):
-            A_ub = []
-            b_ub = []
-            c = [1 for i in range(num_rows+num_cols)]
-            A_ub = [
-                [1 if i < num_rows else 0 for i in range(num_rows+num_cols)]]
-            b_ub.append(1)
-            A_ub.append(
-                [-1 if i < num_rows else 0 for i in range(num_rows+num_cols)])
-            b_ub.append(-1)
-            for k in range(num_rows):
-                A_ub.append(
-                    [-1 if k == j else 0 for j in range(num_rows+num_cols)])
-                b_ub.append(0)
-            for j in range(num_cols):
-                if i != j:
-                    A_ub.append([-matrix2[k][i] + matrix2[k][j] if k <
-                                num_rows else 0 for k in range(num_rows+num_cols)])
-                    b_ub.append(0)
+    i = row_start
+    m = col_start
+    A_ub = []
+    b_ub = []
+    c = [1 for i in range(num_rows+num_cols)]
+    A_ub = [
+        [1 if i < num_rows else 0 for i in range(num_rows+num_cols)]]
+    b_ub.append(1)
+    A_ub.append(
+        [1 if i >= num_rows else 0 for i in range(num_rows+num_cols)])
+    b_ub.append(1)
+    A_ub.append(
+        [-1 if i < num_rows else 0 for i in range(num_rows+num_cols)])
+    b_ub.append(-1)
+    A_ub.append(
+        [-1 if i >= num_rows else 0 for i in range(num_rows+num_cols)])
+    b_ub.append(-1)
+    for k in range(num_rows+num_cols):
+        A_ub.append(
+            [-1 if k == j else 0 for j in range(num_rows+num_cols)])
+        b_ub.append(0)
 
-            # print(A_ub)
-            # print(b_ub)
-            # solver = LPSolver(A_ub, b_ub, c)
-            # print(solver.solve())
-            # print("")
-            # solved = solver.solve()
-            # if solved[0] != -inf:
-            #     flag = 0
-            #     for j in range(len(solved[1])):
-            #         print("{:.6f}".format(solved[1][j]), end=" ")
-            #     print("")
-            # if flag == 0:
-            # A_ub = []
-            # b_ub = []
-            # c = [1 for i in range(num_cols)]
-            A_ub.append(
-                [1 if i >= num_rows else 0 for i in range(num_rows+num_cols)])
-            b_ub.append(1)
-            A_ub.append(
-                [-1 if i >= num_rows else 0 for i in range(num_rows+num_cols)])
-            b_ub.append(-1)
-            for k in range(num_rows):
-                A_ub.append(
-                    [-1 if k+num_cols == j else 0 for j in range(num_cols+num_rows)])
+    for j in range(num_rows):
+        if j != i:
+            if tuple[j] == 1:
+                A_ub.append([-matrix2[i][k-num_rows] + matrix2[j][k-num_rows]
+                            if k >= num_rows else 0 for k in range(num_rows+num_cols)])
+                A_ub.append([matrix2[i][k-num_rows] - matrix2[j][k-num_rows]
+                            if k >= num_rows else 0 for k in range(num_rows+num_cols)])
                 b_ub.append(0)
-            for j in range(num_rows):
-                if i != j and j > num_cols:
-                    A_ub.append([-matrix1[i][k-num_cols] + matrix1[j-num_cols][k-num_cols] if k > num_cols else 0
-                                for k in range(num_cols+num_rows)])
-                    b_ub.append(0)
-            print("A_ub:")
-            print(A_ub)
-            print("b_ub:")
-            print(b_ub)
-            solver = LPSolver(A_ub, b_ub, c)
-            solved = solver.solve()
+                b_ub.append(0)
+            else:
+                A_ub.append([-matrix2[i][k-num_rows] + matrix2[j][k-num_rows]
+                            if k >= num_rows else 0 for k in range(num_rows+num_cols)])
+                b_ub.append(0)
+                A_ub.append(
+                    [1 if k == j else 0 for k in range(num_rows+num_cols)])
+                b_ub.append(0)
+
+    for j in range(num_cols):
+        if m != j:
+            # print("j = {}".format(j))
+            if tuple[j] == 1:
+                A_ub.append([-matrix1[k][m] + matrix1[k][j] if k < num_rows else 0
+                            for k in range(num_cols+num_rows)])
+                A_ub.append([matrix1[k][m] - matrix1[k][j] if k < num_rows else 0
+                            for k in range(num_cols+num_rows)])
+                b_ub.append(0)
+                b_ub.append(0)
+            else:
+                A_ub.append([-matrix1[k][m] + matrix1[k][j] if k < num_cols else 0
+                            for k in range(num_cols+num_rows)])
+                b_ub.append(0)
+                A_ub.append(
+                    [1 if k == j else 0 for k in range(num_cols+num_rows)])
+                b_ub.append(0)
+    print("A_ub:")
+    print(A_ub)
+    print("b_ub:")
+    print(b_ub)
+    solver = LPSolver(A_ub, b_ub, c)
+    solved = solver.solve()
+    print("solved: ", solved)
+    return solved
+
+
+def find_nash_equilibrium_all(matrix1, matrix2, num_rows, num_cols):
+    for i in range(0, 2**num_rows, 1):
+        # print("i: ", i)
+        # print(num_cols)
+        for j in range(0, 2**num_cols, 1):
+            # print("j: ", j)
+            # cast i to binary
+            binary_i = bin(i)[2:]
+            binary_j = bin(j)[2:]
+            # fill the binary number with 0s
+            binary_i = "0" * (num_rows - len(binary_i)) + binary_i
+            binary_j = "0" * (num_cols - len(binary_j)) + binary_j
+            # find first 1 in the binary number
+            my_j = binary_i.find("1")
+            my_k = binary_j.find("1")
+            tuple = [int(i) for i in binary_i] + [int(i) for i in binary_j]
+            # print("tuple: ", tuple)
+            # print("tuple: ", tuple)
+            solved = find_nash_equilibrium(
+                matrix1, matrix2, num_rows, num_cols, my_k, my_j, tuple)
             if solved[0] != -inf:
-                flag = 0
-                print("solved: ")
-                for j in range(len(solved[1])):
-                    print("{:.6f}".format(solved[1][j]), end=" ")
-            # print("")
-            # if flag == 0:
-            #     break
+                # print("j = {}, k = {}".format(my_j, my_k))
+                # print("tuple: ", tuple)
+                # print("solved: ", solved[1])
+                x = solved[1]
+                # take absolute value of the output
+                x = [abs(i) for i in x]
+                # make the output to 6 decimal places
+                for i in range(num_rows):
+                    print("{:.6f}".format(x[i]), end=" ")
+                print()
+                for i in range(num_cols):
+                    print("{:.6f}".format(x[num_rows+i]), end=" ")
 
+                # Exit the program
+                return
+                # print()
+                # print()
 
-# Read the reward matrices siza from the console
+                # Read the reward matrices siza from the console
 num_rows, num_cols = map(int, input().split())
 
 # Read payoff matrix 1 from the console
@@ -241,4 +279,6 @@ for i in range(num_rows):
 
 
 # Find the Nash equilibrium
-find_nash_equilibrium(matrix1, matrix2, num_rows, num_cols)
+# find_nash_equilibrium_all(matrix1, matrix2, num_rows, num_cols)
+find_nash_equilibrium(matrix1, matrix2, num_rows,
+                      num_cols, 0, 0, [1, 1, 0, 1, 1])

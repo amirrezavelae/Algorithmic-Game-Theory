@@ -1,4 +1,5 @@
 from math import inf
+from math import floor
 
 
 class LPSolver(object):
@@ -125,73 +126,61 @@ class LPSolver(object):
         return round(D[m][n + 1], 9), x
 
 
-# def find_nash_equilibrium_row(matrix1, matrix2, num_rows, num_cols):
-#     payoff_matrix1 = [[row[i] for row in matrix1]
-#                       for i in range(len(matrix1[0]))]
-#     payoff_matrix2 = matrix2
-#     # Create the payoff matrix for the linear program
-#     A_ub = []
-#     b_ub = []
-
-#     A_ub = [[1 for i in range(num_cols)]]
-#     A_ub.append([-1 for i in range(num_cols)])
-
-#     for i in range(num_rows):
-#         A_ub.append([-1 if i == j else 0 for j in range(num_cols)])
-#     b_ub.append(1)
-#     b_ub.append(-1)
-#     for i in range(num_cols):
-#         b_ub.append(0)
-#     solved = []
-#     for k in range(num_rows):
-#         c = [1 * payoff_matrix1[k][i] for i in range(num_cols)]
-#         solver = LPSolver(A_ub, b_ub, c)
-#         solved.append(solver.solve())
-#     min
-#     return solved
-
-
-# def find_nash_equilibrium(matrix1, matrix2, num_rows, num_cols):
-#     solved = find_nash_equilibrium_row(matrix1, matrix2, num_rows, num_cols)
-#     print(solved)
-
-
-def find_correlated_nash_equilibrium(matrix1, matrix2, num_rows, num_cols):
-    c = [1 for i in range(num_rows*num_cols)]
-    A = []
-    b = []
+def find_correlated_nash_equilibrium(matrix1, matrix2, num_rows, num_cols, eshg1, eshg2):
+    payoff_matrix1 = [[eshg1 * cell for cell in row] for row in matrix1]
+    payoff_matrix2 = [[eshg2 * cell for cell in row] for row in matrix2]
+    C = []
+    b_ub = []
     for i in range(num_rows):
         for j in range(num_cols):
-            A.append([0 for k in range(num_rows*num_cols)])
-            A[-1][i*num_cols+j] = 1
-    b.append(1)
+            C.append(payoff_matrix1[i][j]+payoff_matrix2[i][j])
+    A_ub = [[1 for i in range(num_rows * num_cols)]]
+    b_ub.append(1)
+    A_ub.append([-1 for i in range(num_rows * num_cols)])
+    b_ub.append(-1)
+    for i in range(num_cols):
+        for j in range(num_rows):
+            A_ub.append([-1 if i*num_rows + j ==
+                        k else 0 for k in range(num_rows * num_cols)])
+            b_ub.append(0)
+    for i in range(num_rows):
+        for j in range(num_rows):
+            if i == j:
+                continue
+            # print("i: ", i)
+            JJJJ = [matrix1[j][k % num_cols] if floor(k / num_cols) <= i and floor(k / num_cols) >
+                    i - 1 else 0 for k in range(num_rows * num_cols)]
+            KKKK = [matrix1[i][k % num_cols] if floor(k / num_cols) <= i and floor(k / num_cols) >
+                    i - 1 else 0 for k in range(num_rows * num_cols)]
+            # print("JJJJ: ", JJJJ)
+            # print("KKKK: ", KKKK)ً
+
+            A_ub.append(subtract_lists(JJJJ, KKKK))
+            b_ub.append(0)
+    for i in range(num_cols):
+        for j in range(num_cols):
+            if i == j:
+                continue
+            JJJJ = [matrix2[floor(k / num_cols)][j] if k % num_cols <= i and k %
+                    num_cols > i - 1 else 0 for k in range(num_rows * num_cols)]
+            KKKK = [matrix2[floor(k / num_cols)][i] if k % num_cols <= i and k %
+                    num_cols > i - 1 else 0 for k in range(num_rows * num_cols)]
+
+            # print("JJJJ: ", JJJJ)
+            # print("KKKK: ", KKKK)
+            A_ub.append(subtract_lists(JJJJ, KKKK))
+            b_ub.append(0)
+    # print("C: ", C)
+    # print("A_ub: ", A_ub)
+    # print("b_ub: ", b_ub)
+
+    solved = LPSolver(A_ub, b_ub, C)
+    print("{:.6f}".format(solved.solve()[0]))
+    x = solved.solve()[1]
     for i in range(num_rows):
         for j in range(num_cols):
-            A.append([0 for k in range(num_rows*num_cols)])
-            A[-1][i*num_cols+j] = -1
-    b.append(-1)
-    for i in range(num_rows):
-        for j in range(num_cols):
-            A.append([0 for k in range(num_rows*num_cols)])
-            A[-1][i*num_cols+j] = -1
-    b.append(0)
-    for i in range(num_rows):
-        for j in range(num_cols):
-            A.append([0 for k in range(num_rows*num_cols)])
-            A[-1][i*num_cols+j] = 1
-    b.append(0)
-    for i in range(num_rows):
-        for j in range(num_cols):
-            A.append([0 for k in range(num_rows*num_cols)])
-            A[-1][i*num_cols+j] = -matrix1[i][j]
-    b.append(0)
-    for i in range(num_rows):
-        for j in range(num_cols):
-            A.append([0 for k in range(num_rows*num_cols)])
-            A[-1][i*num_cols+j] = -matrix2[i][j]
-    b.append(0)
-    solver = LPSolver(A, b, c)
-    print(solver.solve())
+            print("{:.6f}".format(x[i*num_cols + j]), end=" ")
+        print()
 
 
 def slice_even_odd_columns(matrix):
@@ -200,9 +189,15 @@ def slice_even_odd_columns(matrix):
     return even_columns, odd_columns
 
 
-esgh1, esgh2 = map(float, input().split())
+def subtract_lists(list1, list2):
+    return [a - b for a, b in zip(list1, list2)]
+
+
+# Read 2 floating point numbers
+eshg1, eshg2 = map(float, input().split())
 num_rows, num_cols = map(int, input().split())
 
+# print(eshg1)
 total_matrix = []
 for i in range(num_rows):
     total_matrix.append(list(map(int, input().split())))
@@ -213,4 +208,5 @@ matrix1, matrix2 = slice_even_odd_columns(total_matrix)
 
 
 # Find the Nash equilibrium
-find_correlated_nash_equilibrium(matrix1, matrix2, num_rows, num_cols)
+find_correlated_nash_equilibrium(
+    matrix1, matrix2, num_rows, num_cols, eshg1, eshg2)

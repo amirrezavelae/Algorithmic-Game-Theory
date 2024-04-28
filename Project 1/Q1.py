@@ -181,47 +181,47 @@ def find_nash_equilibrium(matrix1, matrix2, num_rows, num_cols, row_start, col_s
             [-1 if k == j else 0 for j in range(num_rows+num_cols)])
         b_ub.append(0)
 
-    for j in range(num_rows):
+    for j in range(num_cols):
         if j != i:
-            if tuple[j] == 1:
-                A_ub.append([-matrix2[i][k-num_rows] + matrix2[j][k-num_rows]
-                            if k >= num_rows else 0 for k in range(num_rows+num_cols)])
-                A_ub.append([matrix2[i][k-num_rows] - matrix2[j][k-num_rows]
-                            if k >= num_rows else 0 for k in range(num_rows+num_cols)])
+            if tuple[j+num_rows] == 1:
+                A_ub.append([-matrix2[k][i] + matrix2[k][j] if k <
+                            num_rows else 0 for k in range(num_rows+num_cols)])
+                A_ub.append([matrix2[k][i] - matrix2[k][j] if k <
+                            num_rows else 0 for k in range(num_rows+num_cols)])
                 b_ub.append(0)
                 b_ub.append(0)
             else:
-                A_ub.append([-matrix2[i][k-num_rows] + matrix2[j][k-num_rows]
-                            if k >= num_rows else 0 for k in range(num_rows+num_cols)])
+                A_ub.append([-matrix2[k][i] + matrix2[k][j] if k <
+                            num_rows else 0 for k in range(num_rows+num_cols)])
                 b_ub.append(0)
                 A_ub.append(
-                    [1 if k == j else 0 for k in range(num_rows+num_cols)])
+                    [1 if k == j+num_rows else 0 for k in range(num_rows+num_cols)])
                 b_ub.append(0)
 
-    for j in range(num_cols):
+    for j in range(num_rows):
         if m != j:
             # print("j = {}".format(j))
             if tuple[j] == 1:
-                A_ub.append([-matrix1[k][m] + matrix1[k][j] if k < num_rows else 0
+                A_ub.append([-matrix1[m][k-num_rows] + matrix1[j][k-num_rows] if k >= num_rows else 0
                             for k in range(num_cols+num_rows)])
-                A_ub.append([matrix1[k][m] - matrix1[k][j] if k < num_rows else 0
+                A_ub.append([matrix1[m][k-num_rows] - matrix1[j][k-num_rows] if k >= num_rows else 0
                             for k in range(num_cols+num_rows)])
                 b_ub.append(0)
                 b_ub.append(0)
             else:
-                A_ub.append([-matrix1[k][m] + matrix1[k][j] if k < num_cols else 0
+                A_ub.append([-matrix1[m][k-num_rows] + matrix1[j][k-num_rows] if k >= num_rows else 0
                             for k in range(num_cols+num_rows)])
                 b_ub.append(0)
                 A_ub.append(
                     [1 if k == j else 0 for k in range(num_cols+num_rows)])
                 b_ub.append(0)
-    print("A_ub:")
-    print(A_ub)
-    print("b_ub:")
-    print(b_ub)
+    # print("A_ub:")
+    # print(A_ub)
+    # print("b_ub:")
+    # print(b_ub)
     solver = LPSolver(A_ub, b_ub, c)
     solved = solver.solve()
-    print("solved: ", solved)
+    # print("solved: ", solved)
     return solved
 
 
@@ -279,6 +279,6 @@ for i in range(num_rows):
 
 
 # Find the Nash equilibrium
-# find_nash_equilibrium_all(matrix1, matrix2, num_rows, num_cols)
-find_nash_equilibrium(matrix1, matrix2, num_rows,
-                      num_cols, 0, 0, [1, 1, 0, 1, 1])
+find_nash_equilibrium_all(matrix1, matrix2, num_rows, num_cols)
+# find_nash_equilibrium(matrix1, matrix2, num_rows,
+#                       num_cols, 0, 0, [1, 1, 0, 1, 1])

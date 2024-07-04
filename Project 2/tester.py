@@ -105,7 +105,7 @@ class UltimatumGameTester:
         #         f"Round {result[0]}: Offer = {result[1]}, Accepted = {result[2]}")
 
         print("Player 1 log:" + str(player1.my_log))
-        print("Player 2 log:" + str(player2.my_log))
+        # print("Player 2 log:" + str(player2.my_log))
         print("Player 1 score: " + str(player1_score))
         print("Player 2 score: " + str(player2_score))
 

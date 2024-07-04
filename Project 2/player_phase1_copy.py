@@ -21,7 +21,7 @@ class UGPlayerPhase1_4001022222:
         Returns:
             int: The amount offered to the responder (0 to 100).
         """
-        return 100
+        return 50
 
     def responder_strategy(self, round_number: int, offer: int) -> bool:
         """
@@ -34,7 +34,8 @@ class UGPlayerPhase1_4001022222:
         Returns:
             bool: True if the offer is accepted, False otherwise.
         """
-        return True
+        print(f"Round {round_number}: {offer}")
+        return offer >= 50
 
     def result(self, round_number: int, score: int) -> None:
         """

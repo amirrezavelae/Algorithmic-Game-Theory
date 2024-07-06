@@ -3,11 +3,17 @@ class UGPlayerPhase1_400102222:
         self.proposer = True
         self.my_log = []
         self.opponent_log = []
+        self.my_score = []
+        self.bid_even = 1
+        self.dick_head_bid = 10
 
     def reset(self) -> None:
         """ Reset any state variables if necessary. Called before starting a new game. """
         self.my_log = []
         self.opponent_log = []
+        self.my_score = []
+        self.bid_even = 1
+        self.dick_head_bid = 10
 
     def proposer_strategy(self, round_number: int) -> int:
         """
@@ -31,9 +37,12 @@ class UGPlayerPhase1_400102222:
                 bid = 50
         else:
             # First round, make a fair offer
-            bid = 50
+            bid = 100
+            bid_even = 0
+        if round_number > 8 and self.my_score[-1] == 0 and self.my_score[-2] == 0 and self.my_score[-3] == 0:
+            self.dick_head_bid = self.my_log[-1] + 10
+        bid = max(bid, self.dick_head_bid)
         self.my_log.append(bid)
-        if self.my_log[-1] == self.my_log[-2] == 50 and
         return bid
 
     def responder_strategy(self, round_number: int, offer: int) -> bool:
@@ -48,7 +57,7 @@ class UGPlayerPhase1_400102222:
             bool: True if the offer is accepted, False otherwise.
         """
         # Personal threshold set at 30%
-        personal_threshold = 30
+        personal_threshold = 40
         flexible_threshold = True
 
         if flexible_threshold:
@@ -62,7 +71,6 @@ class UGPlayerPhase1_400102222:
             threshold = personal_threshold
 
         self.opponent_log.append((offer, offer >= threshold))
-        threshold = threshold - 5
         return offer >= threshold
         # return True
 
@@ -74,4 +82,5 @@ class UGPlayerPhase1_400102222:
             round_number (int): The round number (1 to 100).
             score (int): The score for the round.
         """
-        # print(f"Round {round_number}: {score}")
+        self.my_score.append(score)
+        print(f"Round {round_number}: {score}")

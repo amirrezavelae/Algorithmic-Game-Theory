@@ -1,7 +1,7 @@
 import sys
 import threading
-from player_phase1 import UGPlayerPhase1_400102222 as player_class1
-from player_phase1 import UGPlayerPhase1_400102222 as player_class2
+from player_phase2 import UGPlayerPhase2_400102222 as player_class1
+from player_phase2_copy import UGPlayerPhase2_400102222 as player_class2
 import random
 
 
@@ -43,6 +43,7 @@ class UltimatumGameTester:
 
         if self.noisy:
             offer += random.gauss(0, 5)
+        # print(offer)
 
         acceptance = self.run_with_timeout(
             responder.responder_strategy, round_number, offer)
@@ -97,16 +98,23 @@ class UltimatumGameTester:
         """Run the test and print the results."""
         results, player1, player2 = self.play_game()
         player1_score, player2_score = self.calculate_scores(results)
-        print("Player 1 log:" + str(player1.my_log))
-        print("Player 1 score: " + str(player1_score))
-        print("Player 2 score: " + str(player2_score))
+        # print("Player 1 log:" + str(player1.my_log))
+        # print("Player 1 score: " + str(player1_score))
+        # print("Player 2 score: " + str(player2_score))
+        return player1_score, player2_score
 
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1 and sys.argv[1] == "--noisy":
-        noisy = True
-    else:
-        noisy = False
+    noisy = True
     # Change the player classes here to test different players
+    sum_1 = 0
+    sum_2 = 0
+    rounds_toplay = 500
     tester = UltimatumGameTester(player_class1, player_class2, noisy=noisy)
     tester.run()
+    for i in range(rounds_toplay):
+        player1_score, player2_score = tester.run()
+        sum_1 += player1_score
+        sum_2 += player2_score
+    print("Player 1 average score: " + str(sum_1 / rounds_toplay))
+    print("Player 2 average score: " + str(sum_2 / rounds_toplay))

@@ -1,7 +1,11 @@
 import sys
 import threading
 from player_phase2 import UGPlayerPhase2_400102222 as player_class1
-from player_phase2_copy import UGPlayerPhase2_400102222 as player_class2
+from player_phase2_copy import UGPlayerPhase1_4001022221 as player_class2
+from player_phase2_copy import UGPlayerPhase1_4001022222 as player_class3
+from player_phase2_copy import UGPlayerPhase1_4001022223 as player_class4
+from player_phase2_copy import UGPlayerPhase1_4001022224 as player_class5
+from player_phase2_copy import UGPlayerPhase1_4001022225 as player_class6
 import random
 
 
@@ -37,7 +41,7 @@ class UltimatumGameTester:
         offer = self.run_with_timeout(proposer.proposer_strategy, round_number)
         # print(offer)
         if isinstance(offer, TimeoutError) or offer is None or offer < 0 or offer > 100:
-            print("Error in proposer strategy, using default offer.")
+            # print("Error in proposer strategy, using default offer.")
             offer = 100  # Default offer if proposer strategy times out
         offer = int(offer)
 
@@ -107,14 +111,41 @@ class UltimatumGameTester:
 if __name__ == "__main__":
     noisy = True
     # Change the player classes here to test different players
-    sum_1 = 0
-    sum_2 = 0
-    rounds_toplay = 500
+    sum_1 = [0 for i in range(5)]
+    sum_2 = [0 for i in range(5)]
+    rounds_toplay = 300
     tester = UltimatumGameTester(player_class1, player_class2, noisy=noisy)
-    tester.run()
+    # for i in range(rounds_toplay):
+    #     player1_score, player2_score = tester.run()
+    #     sum_1[0] += player1_score
+    #     sum_2[0] += player2_score
+    # print("Player 1 average score: " + str(sum_1[0] / rounds_toplay))
+    # print("Player 2 average score: " + str(sum_2[0] / rounds_toplay))
+    # tester = UltimatumGameTester(player_class1, player_class3, noisy=noisy)
+    # for i in range(rounds_toplay):
+    #     player1_score, player2_score = tester.run()
+    #     sum_1[1] += player1_score
+    #     sum_2[1] += player2_score
+    # print("Player 1 average score: " + str(sum_1[1] / rounds_toplay))
+    # print("Player 2 average score: " + str(sum_2[1] / rounds_toplay))
+    # tester = UltimatumGameTester(player_class1, player_class4, noisy=noisy)
+    # for i in range(rounds_toplay):
+    #     player1_score, player2_score = tester.run()
+    #     sum_1[2] += player1_score
+    #     sum_2[2] += player2_score
+    # print("Player 1 average score: " + str(sum_1[2] / rounds_toplay))
+    # print("Player 2 average score: " + str(sum_2[2] / rounds_toplay))
+    # tester = UltimatumGameTester(player_class1, player_class5, noisy=noisy)
+    # for i in range(rounds_toplay):
+    #     player1_score, player2_score = tester.run()
+    #     sum_1[3] += player1_score
+    #     sum_2[3] += player2_score
+    # print("Player 1 average score: " + str(sum_1[3] / rounds_toplay))
+    # print("Player 2 average score: " + str(sum_2[3] / rounds_toplay))
+    # tester = UltimatumGameTester(player_class1, player_class6, noisy=noisy)
     for i in range(rounds_toplay):
         player1_score, player2_score = tester.run()
-        sum_1 += player1_score
-        sum_2 += player2_score
-    print("Player 1 average score: " + str(sum_1 / rounds_toplay))
-    print("Player 2 average score: " + str(sum_2 / rounds_toplay))
+        sum_1[4] += player1_score
+        sum_2[4] += player2_score
+    print("Player 1 average score: " + str(sum_1[4] / rounds_toplay))
+    print("Player 2 average score: " + str(sum_2[4] / rounds_toplay))

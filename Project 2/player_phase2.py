@@ -29,9 +29,9 @@ class UGPlayerPhase2_400102222:
             offer = 50  # Start with a generous offer
         else:
             # Mimic the last offer received, with adjustments
-            offer = max(0, min(100, self.last_offer_received)) - 4
+            offer = max(0, min(100, self.last_offer_received)) - 4.2
             if offer < 10:
-                offer = 15
+                offer = 10
             # print(offer)
         self.last_offer_made = offer
         return offer

@@ -30,4 +30,4 @@ class Agent99100000:
         pass
 
     def slogan(self) -> str:
-        return "I am a great agent!"
+        return "The traitor is the greatest sage."

@@ -5,7 +5,9 @@ class UGPlayerPhase1_400102222:
         self.opponent_log = []
         self.my_score = []
         self.bid_even = 1
-        self.dick_head_bid = 10
+        self.dick_head_acceptor = 10
+        self.dick_head_bidder = 0
+        self.pitty_tit_for_tat = False
 
     def reset(self) -> None:
         """ Reset any state variables if necessary. Called before starting a new game. """
@@ -13,7 +15,9 @@ class UGPlayerPhase1_400102222:
         self.opponent_log = []
         self.my_score = []
         self.bid_even = 1
-        self.dick_head_bid = 10
+        self.dick_head_acceptor = 10
+        self.dick_head_bidder = 0
+        self.pitty_tit_for_tat = False
 
     def proposer_strategy(self, round_number: int) -> int:
         """
@@ -37,11 +41,35 @@ class UGPlayerPhase1_400102222:
                 bid = 50
         else:
             # First round, make a fair offer
-            bid = 100
+            bid = 50
             bid_even = 0
         if round_number > 8 and self.my_score[-1] == 0 and self.my_score[-2] == 0 and self.my_score[-3] == 0:
-            self.dick_head_bid = self.my_log[-1] + 10
-        bid = max(bid, self.dick_head_bid)
+            self.dick_head_acceptor = self.my_log[-1] + 10
+        bid = max(bid, self.dick_head_acceptor)
+
+        if not self.dick_head_bidder and round_number > 10:
+            sum_bid = 0
+            index = 0
+            # 5 min offers in oppenents log
+            for i in range(len(self.opponent_log) - 1, max(len(self.opponent_log) - 6, 0), -1):
+                sum_bid += self.opponent_log[i][0]
+                index += 1
+            if sum_bid < 20:
+                self.dick_head_bidder = True
+        if self.dick_head_bidder:
+            bid = 10
+        if not round_number % 10:
+            self.dick_head_bidder = False
+
+        if round_number > 9 and (round_number//2) % 5 == 0 and not self.pitty_tit_for_tat:
+            self.pitty_tit_for_tat = self.is_tit_for_tat_player()
+            # print("------------")
+            if self.pitty_tit_for_tat:
+                bid = 55
+        if round_number > 15 and (round_number//2) % 2 == 0 and self.pitty_tit_for_tat:
+            # print(round_number)
+            if self.is_tit_for_tat_player():
+                bid = 100
         self.my_log.append(bid)
         return bid
 
@@ -57,7 +85,7 @@ class UGPlayerPhase1_400102222:
             bool: True if the offer is accepted, False otherwise.
         """
         # Personal threshold set at 30%
-        personal_threshold = 40
+        personal_threshold = 30
         flexible_threshold = True
 
         if flexible_threshold:
@@ -83,4 +111,26 @@ class UGPlayerPhase1_400102222:
             score (int): The score for the round.
         """
         self.my_score.append(score)
-        print(f"Round {round_number}: {score}")
+        # print(f"Is tit for tat{self.pitty_tit_for_tat}")
+        # print(f"Is proposer even: {self.bid_even}")
+        # print(f"Round {round_number}: {score}")
+
+    def is_tit_for_tat_player(self) -> bool:
+        tit_for_tat_counter = 0
+        total_comparable_rounds = len(self.my_log) - 1
+
+        for i in range(1, len(self.my_log)):
+            # print(self.my_log[i-1])
+            # print(self.opponent_log[i-1][0])
+            if self.opponent_log[i-1][0] == self.my_log[i-1]:
+                tit_for_tat_counter += 1
+
+        if total_comparable_rounds > 0:
+            tit_for_tat_percentage = (
+                tit_for_tat_counter / total_comparable_rounds) * 100
+        else:
+            return False  # Cannot determine if no rounds to compare
+
+        # Assuming a threshold of 80% to consider the opponent as "tit for tat" player
+        # print(tit_for_tat_percentage)
+        return tit_for_tat_percentage >= 98

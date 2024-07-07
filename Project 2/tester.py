@@ -1,7 +1,10 @@
 import sys
 import threading
 from player_phase1 import UGPlayerPhase1_400102222 as player_class1
-from player_phase1 import UGPlayerPhase1_400102222 as player_class2
+from player_phase1_copy import UGPlayerPhase1_4001022221 as player_class2
+from player_phase1_copy import UGPlayerPhase1_4001022222 as player_class3
+from player_phase1_copy import UGPlayerPhase1_4001022223 as player_class4
+from player_phase1_copy import UGPlayerPhase1_4001022224 as player_class5
 import random
 
 
@@ -97,7 +100,8 @@ class UltimatumGameTester:
         """Run the test and print the results."""
         results, player1, player2 = self.play_game()
         player1_score, player2_score = self.calculate_scores(results)
-        print("Player 1 log:" + str(player1.my_log))
+        # print("Player 1 log:" + str(player1.my_log))
+        # print("Player 2 log:" + str(player1.opponent_log))
         print("Player 1 score: " + str(player1_score))
         print("Player 2 score: " + str(player2_score))
 
@@ -110,3 +114,17 @@ if __name__ == "__main__":
     # Change the player classes here to test different players
     tester = UltimatumGameTester(player_class1, player_class2, noisy=noisy)
     tester.run()
+    tester = UltimatumGameTester(player_class1, player_class3, noisy=noisy)
+    tester.run()
+    tester = UltimatumGameTester(player_class1, player_class4, noisy=noisy)
+    tester.run()
+    tester = UltimatumGameTester(player_class1, player_class5, noisy=noisy)
+    tester.run()
+    # tester = UltimatumGameTester(player_class2, player_class1, noisy=noisy)
+    # tester.run()
+    # tester = UltimatumGameTester(player_class3, player_class1, noisy=noisy)
+    # tester.run()
+    # tester = UltimatumGameTester(player_class4, player_class1, noisy=noisy)
+    # tester.run()
+    # tester = UltimatumGameTester(player_class5, player_class1, noisy=noisy)
+    # tester.run()

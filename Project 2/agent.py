@@ -20,6 +20,7 @@ class Agent400102222:
         self.dick_head_bidder = 0
         self.pitty_tit_for_tat = False
         self.round_number = 1
+        self.my_id = player_log.player_id
 
     def proposer_strategy(self) -> int:
         if self.round_number > 1 and self.opponent_log_list:
@@ -80,8 +81,14 @@ class Agent400102222:
         return accepted
 
     def result(self, result: Round) -> None:
-        self.my_score.append(result.score)
-        self.round_number = Round + 1
+        # print(result)
+        if result.accepted:
+            self.my_score.append(result.offer)
+        else:
+            self.my_score.append(0)
+        # print(self.my_score)
+        # print(self.round_number)
+        self.round_number = self.round_number + 1
 
     def slogan(self) -> str:
         return "The traitor is the greatest sage."

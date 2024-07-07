@@ -28,6 +28,8 @@ if __name__ == "__main__":
     is_proposer = rand.choice([True, False])
     agent = Agent400102222(player_log, opponent_log, is_proposer)
     if is_proposer:
-        print(agent.proposer_strategy())
+        print()
+        agent.result(Round(1, 1, 2, agent.proposer_strategy(), True))
     else:
-        print(agent.responder_strategy(rand.randint(0, 100)))
+        agent.result(Round(1, 2, 1, 40,
+                           agent.responder_strategy(rand.randint(0, 100))))

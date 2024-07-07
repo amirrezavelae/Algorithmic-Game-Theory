@@ -1,6 +1,7 @@
 import random as rand
-from agent import Agent99100000
+from agent import Agent400102222
 from models import Log, Round
+
 
 def generate_random_log(player_id: int) -> Log:
     player_log: Log = Log(player_id, [])
@@ -18,13 +19,14 @@ def generate_random_log(player_id: int) -> Log:
         player_log.games.append(r)
     return player_log
 
+
 if __name__ == "__main__":
     rounds = 10
     player_log = generate_random_log(1)
     opponent_log = generate_random_log(2)
 
     is_proposer = rand.choice([True, False])
-    agent = Agent99100000(player_log, opponent_log, is_proposer)
+    agent = Agent400102222(player_log, opponent_log, is_proposer)
     if is_proposer:
         print(agent.proposer_strategy())
     else:
